@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aha Agency</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a12;
+      --surface: #12121e;
+      --surface2: #1a1a2e;
+      --border: rgba(255,255,255,0.07);
+      --accent: #7c5cfc;
+      --accent2: #5cbbfc;
+      --gold: #f5c542;
+      --silver: #b0bec5;
+      --bronze: #ce9a5c;
+      --text: #f0f0ff;
+      --muted: rgba(240,240,255,0.5);
+      --radius: 16px;
+      --glow: 0 0 32px rgba(124,92,252,0.18);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,18,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+    }
+    .nav-logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--surface2);
+      border-radius: 30px;
+      padding: 4px;
+    }
+    .nav-tab {
+      padding: 7px 18px;
+      border-radius: 24px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: transparent;
+      transition: all 0.25s;
+    }
+    .nav-tab.active {
+      background: linear-gradient(135deg, var(--accent), #9c82fd);
+      color: #fff;
+      box-shadow: 0 2px 14px rgba(124,92,252,0.35);
+    }
+
+    /* ── SECTIONS ── */
+    .section { display: none; padding: 24px 18px 40px; animation: fadeUp 0.4s ease; }
+    .section.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-header { text-align: center; margin-bottom: 28px; }
+    .section-header h1 { font-size: 1.65rem; font-weight: 800; margin-bottom: 8px; }
+    .section-header p  { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+    .grad-text {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ── PACKAGE CATEGORY PILLS ── */
+    .pkg-categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 24px;
+      scrollbar-width: none;
+    }
+    .pkg-categories::-webkit-scrollbar { display: none; }
+    .pkg-pill {
+      flex-shrink: 0;
+      padding: 8px 20px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: inherit;
+    }
+    .pkg-pill.active, .pkg-pill:hover {
+      border-color: var(--accent);
+      color: #fff;
+      background: rgba(124,92,252,0.12);
+    }
+
+    /* ── PACKAGE GRID ── */
+    .pkg-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media(min-width: 520px) {
+      .pkg-grid { grid-template-columns: repeat(3,1fr); }
+    }
+
+    .pkg-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      transition: transform 0.25s, box-shadow 0.25s;
+      overflow: hidden;
+    }
+    .pkg-card:hover { transform: translateY(-4px); box-shadow: var(--glow); }
+    .pkg-card.featured {
+      border-color: var(--accent);
+      background: linear-gradient(145deg, #14132a, #1a1838);
+      box-shadow: 0 0 40px rgba(124,92,252,0.2);
+    }
+    .pkg-badge {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: linear-gradient(135deg, var(--accent), #9c82fd);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .pkg-tier-icon { font-size: 2rem; margin-bottom: 10px; }
+    .pkg-tier-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .pkg-tier-name.starter { color: var(--silver); }
+    .pkg-tier-name.business { color: var(--accent); }
+    .pkg-tier-name.premium  { color: var(--gold); }
+    .pkg-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+    .pkg-price {
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .pkg-price span { font-size: 0.85rem; font-weight: 400; color: var(--muted); }
+    .pkg-timeline {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .pkg-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .pkg-features { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .pkg-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.83rem;
+      color: rgba(240,240,255,0.85);
+      line-height: 1.4;
+    }
+    .pkg-features li .check { color: #5cfc9c; font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+    .pkg-features li .x     { color: #ff6b6b; font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+    .pkg-cta {
+      display: block;
+      margin-top: 20px;
+      padding: 11px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.25s;
+    }
+    .pkg-cta.primary {
+      background: linear-gradient(135deg, var(--accent), #9c82fd);
+      color: #fff;
+    }
+    .pkg-cta.secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .pkg-cta:hover { opacity: 0.85; transform: scale(1.02); }
+
+    /* ── PORTFOLIO ── */
+    .portfolio-filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 24px;
+      scrollbar-width: none;
+    }
+    .portfolio-filters::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      flex-shrink: 0;
+      padding: 7px 18px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: inherit;
+    }
+    .filter-pill.active, .filter-pill:hover {
+      border-color: var(--accent2);
+      color: #fff;
+      background: rgba(92,187,252,0.1);
+    }
+
+    .portfolio-grid { display: flex; flex-direction: column; gap: 18px; }
+
+    .port-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .port-card:hover { transform: translateY(-3px); box-shadow: 0 0 28px rgba(92,187,252,0.12); }
+    .port-card-header {
+      padding: 20px 20px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .port-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .port-icon.mobile  { background: linear-gradient(135deg, #7c5cfc22, #5cbbfc22); border: 1px solid rgba(124,92,252,0.3); }
+    .port-icon.web     { background: linear-gradient(135deg, #5cfc9c22, #5cbbfc22); border: 1px solid rgba(92,252,156,0.3); }
+    .port-icon.ai      { background: linear-gradient(135deg, #f5c54222, #fc5c5c22); border: 1px solid rgba(245,197,66,0.3); }
+    .port-meta { flex: 1; }
+    .port-type-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+    .port-type-badge.mobile { background: rgba(124,92,252,0.15); color: #a87cfd; }
+    .port-type-badge.web    { background: rgba(92,252,156,0.12); color: #5cfc9c; }
+    .port-type-badge.ai     { background: rgba(245,197,66,0.12); color: #f5c542; }
+    .port-title { font-size: 1.05rem; font-weight: 700; }
+    .port-subtitle { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .port-stat {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(92,252,156,0.12);
+      color: #5cfc9c;
+      align-self: flex-start;
+      flex-shrink: 0;
+    }
+    .port-body { padding: 14px 20px 0; }
+    .port-desc {
+      font-size: 0.83rem;
+      color: rgba(240,240,255,0.72);
+      line-height: 1.65;
+    }
+    .port-tech-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 14px;
+    }
+    .tech-chip {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .port-features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 12px;
+    }
+    .port-features-list li {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.8rem;
+      color: rgba(240,240,255,0.75);
+    }
+    .port-features-list li::before {
+      content: '▸';
+      color: var(--accent2);
+      font-size: 0.7rem;
+    }
+    .port-links {
+      display: flex;
+      gap: 10px;
+      padding: 16px 20px 20px;
+      flex-wrap: wrap;
+    }
+    .port-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .port-link.demo {
+      background: linear-gradient(135deg, var(--accent), #9c82fd);
+      color: #fff;
+    }
+    .port-link.github {
+      background: var(--surface2);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .port-link.store {
+      background: rgba(92,252,156,0.12);
+      border-color: rgba(92,252,156,0.25);
+      color: #5cfc9c;
+    }
+    .port-link:hover { opacity: 0.82; transform: scale(1.03); }
+
+    /* ── HIDDEN PORTFOLIOS ── */
+    .port-card[data-type] { transition: all 0.3s; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">✦ Aha Agency</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('packages')">📦 Packages</button>
+    <button class="nav-tab"       onclick="showSection('portfolio')">📁 Portfolio</button>
+  </div>
+</nav>
+
+<!-- ══════════════ PACKAGES ══════════════ -->
+<div id="packages" class="section active">
+  <div class="section-header">
+    <h1>Choose Your <span class="grad-text">Plan</span></h1>
+    <p>Transparent pricing, zero guesswork. Pick a product category and find your tier.</p>
+  </div>
+
+  <div class="pkg-categories">
+    <button class="pkg-pill active" onclick="filterPkg('web',this)">🌐 Web App</button>
+    <button class="pkg-pill" onclick="filterPkg('mobile',this)">📱 Mobile App</button>
+    <button class="pkg-pill" onclick="filterPkg('bot',this)">🤖 Telegram Bot</button>
+  </div>
+
+  <!-- WEB APP PACKAGES -->
+  <div class="pkg-grid" id="pkg-web">
+    <!-- STARTER -->
+    <div class="pkg-card">
+      <div class="pkg-tier-icon">🌱</div>
+      <div class="pkg-tier-name starter">Starter</div>
+      <div class="pkg-title">Landing Page</div>
+      <div class="pkg-price">$299 <span>/ one-time</span></div>
+      <div class="pkg-timeline">⏱ 3–5 Business Days</div>
+      <hr class="pkg-divider" />
+      <ul class="pkg-features">
+        <li><span class="check">✓</span> Up to 3 pages (Home, About, Contact)</li>
+        <li><span class="check">✓</span> Responsive mobile-first design</li>
+        <li><span class="check">✓</span> Contact form integration</li>
+        <li><span class="check">✓</span> Basic SEO setup</li>
+        <li><span class="check">✓</span> Vercel / Netlify deployment</li>
+        <li><span class="x">✗</span> Backend / Database</li>
+        <li><span class="x">✗</span> User authentication</li>
+        <li><span class="x">✗</span> Admin dashboard</li>
+      </ul>
+      <button class="pkg-cta secondary" onclick="startProject('Web App – Starter')">Get Started</button>
+    </div>
+    <!-- BUSINESS -->
+    <div class="pkg-card featured">
+      <div class="pkg-badge">Most Popular</div>
+      <div class="pkg-tier-icon">🚀</div>
+      <div class="pkg-tier-name business">Business</div>
+      <div class="pkg-title">Full-Stack Web App</div>
+      <div class="pkg-price">$899 <span>/ one-time</span></div>
+      <div class="pkg-timeline">⏱ 2–4 Weeks</div>
+      <hr class="pkg-divider" />
+      <ul class="pkg-features">
+        <li><span class="check">✓</span> Up to 10 pages + dynamic routes</li>
+        <li><span class="check">✓</span> Node.js + Express + MySQL backend</li>
+        <li><span class="check">✓</span> JWT Authentication & authorization</li>
+        <li><span class="check">✓</span> Admin dashboard panel</li>
+        <li><span class="check">✓</span> CRUD operations & REST API</li>
+        <li><span class="check">✓</span> Payment gateway (Telebirr / Stripe)</li>
+        <li><span class="check">✓</span> SEO + performance optimization</li>
+        <li><span class="x">✗</span> AI/ML integrations</li>
+      </ul>
+      <button class="pkg-cta primary" onclick="startProject('Web App – Business')">Get Started</button>
+    </div>
+    <!-- PREMIUM -->
+    <div class="pkg-card">
+      <div class="pkg-tier-icon">💎</div>
+      <div class="pkg-tier-name premium">Premium</div>
+      <div class="pkg-title">SaaS / Enterprise</div>
+      <div class="pkg-price">$1,999+ <span>/ quote</span></div>
+      <div class="pkg-timeline">⏱ 4–8 Weeks</div>
+      <hr class="pkg-divider" />
+      <ul class="pkg-features">
+        <li><span class="check">✓</span> Unlimited pages & modules</li>
+        <li><span class="check">✓</span> Multi-role user system</li>
+        <li><span class="check">✓</span> AI / LLM integration</li>
+        <li><span class="check">✓</span> Real-time features (WebSockets)</li>
+        <li><span class="check">✓</span> Cloud hosting + CI/CD pipeline</li>
+        <li><span class="check">✓</span> Analytics & reporting dashboard</li>
+        <li><span class="check">✓</span> 3-month post-launch support</li>
+        <li><span class="check">✓</span> Custom scalable architecture</li>
+      </ul>
+      <button class="pkg-cta secondary" onclick="startProject('Web App – Premium')">Get Started</button>
+    </div>
+  </div>
+
+  <!-- MOBILE APP PACKAGES -->
+  <div class="pkg-grid" id="pkg-mobile" style="display:none;">
+    <div class="pkg-card">
+      <div class="pkg-tier-icon">🌱</div>
+      <div class="pkg-tier-name starter">Starter</div>
+      <div class="pkg-title">MVP App</div>
+      <div class="pkg-price">$599 <span>/ one-time</span></div>
+      <div class="pkg-timeline">⏱ 2–4 Weeks</div>
+      <hr class="pkg-divider" />
+      <ul class="pkg-features">
+        <li><span class="check">✓</span> Up to 5 screens</li>
+        <li><span class="check">✓</span> Flutter cross-platform (iOS + Android)</li>
+        <li><span class="check">✓</span> Basic REST API integration</li>
+        <li><span class="check">✓</span> Auth (login / register)</li>
+        <li><span class="check">✓</span> Play Store / App Store prep</li>
+        <li><span class="x">✗</span> Custom backend</li>
+        <li><span class="x">✗</span> Push notifications</li>
+        <li><span class="x">✗</span> Offline mode</li>
+      </ul>
+      <button class="pkg-cta secondary" onclick="startProject('Mobile App – Starter')">Get Started</button>
+    </div>
+    <div class="pkg-card featured">
+      <div class="pkg-badge">Most Popular</div>
+      <div class="pkg-tier-icon">🚀</div>
+      <div class="pkg-tier-name business">Business</div>
+      <div class="pkg-title">Production App</div>
+      <div class="pkg-price">$1,299 <span>/ one-time</span></div>
+      <div class="pkg-timeline">⏱ 4–8 Weeks</div>
+      <hr class="pkg-divider" />
+      <ul class="pkg-features">
+        <li><span class="check">✓</span> Up to 15 screens</li>
+        <li><span class="check">✓</span> Flutter + custom Node.js backend</li>
+        <li><span class="check">✓</span> Push notifications</li>
+        <li><span class="check">✓</span> Offline data caching</li>
+        <li><span class="check">✓</span> Admin dashboard</li>
+        <li><span class="check">✓</span> In-app purchases / payments</li>
+        <li><span class="check">✓</span> Play Store & App Store deployment</li>
+        <li><span class="x">✗</span> AI features</li>
+      </ul>
+      <button class="pkg-cta primary" onclick="startProject('Mobile App – Business')">Get Started</button>
+    </div>
+    <div class="pkg-card">
+      <div class="pkg-tier-icon">💎</div>
+      <div class="pkg-tier-name premium">Premium</div>
+      <div class="pkg-title">Enterprise Suite</div>
+      <div class="pkg-price">$2,799+ <span>/ quote</span></div>
+      <div class="pkg-timeline">⏱ 8–16 Weeks</div>
+      <hr class="pkg-divider" />
+      <ul class="pkg-features">
+        <li><span class="check">✓</span> Unlimited screens & flows</li>
+        <li><span class="check">✓</span> AI / ML model integration</li>
+        <li><span class="check">✓</span> Voice & NLP interfaces</li>
+        <li><span class="check">✓</span> Multi-language support</li>
+        <li><span class="check">✓</span> Advanced analytics SDK</li>
+        <li><span class="check">✓</span> Real-time collaboration features</li>
+        <li><span class="check">✓</span> 6-month post-launch support</li>
+        <li><span class="check">✓</span> Dedicated project manager</li>
+      </ul>
+      <button class="pkg-cta secondary" onclick="startProject('Mobile App – Premium')">Get Started</button>
+    </div>
+  </div>
+
+  <!-- BOT PACKAGES -->
+  <div class="pkg-grid" id="pkg-bot" style="display:none;">
+    <div class="pkg-card">
+      <div class="pkg-tier-icon">🌱</div>
+      <div class="pkg-tier-name starter">Starter</div>
+      <div class="pkg-title">Simple Bot</div>
+      <div class="pkg-price">$149 <span>/ one-time</span></div>
+      <div class="pkg-timeline">⏱ 3–7 Days</div>
+      <hr class="pkg-divider" />
+      <ul class="pkg-features">
+        <li><span class="check">✓</span> Up to 5 command flows</li>
+        <li><span class="check">✓</span> Inline keyboard menus</li>
+        <li><span class="check">✓</span> Lead capture & forwarding</li>
+        <li><span class="check">✓</span> Telegraf.js deployment</li>
+        <li><span class="check">✓</span> Basic session management</li>
+        <li><span class="x">✗</span> Mini App (WebApp)</li>
+        <li><span class="x">✗</span> Database backend</li>
+        <li><span class="x">✗</span> Payment integration</li>
+      </ul>
+      <button class="pkg-cta secondary" onclick="startProject('Telegram Bot – Starter')">Get Started</button>
+    </div>
+    <div class="pkg-card featured">
+      <div class="pkg-badge">Most Popular</div>
+      <div class="pkg-tier-icon">🚀</div>
+      <div class="pkg-tier-name business">Business</div>
+      <div class="pkg-title">Advanced Bot</div>
+      <div class="pkg-price">$499 <span>/ one-time</span></div>
+      <div class="pkg-timeline">⏱ 1–2 Weeks</div>
+      <hr class="pkg-divider" />
+      <ul class="pkg-features">
+        <li><span class="check">✓</span> Unlimited command flows</li>
+        <li><span class="check">✓</span> Mini App (Telegram WebApp)</li>
+        <li><span class="check">✓</span> Node.js + Database backend</li>
+        <li><span class="check">✓</span> User management system</li>
+        <li><span class="check">✓</span> Telegram Payments API</li>
+        <li><span class="check">✓</span> Webhook deployment</li>
+        <li><span class="check">✓</span> Admin notifications</li>
+        <li><span class="x">✗</span> AI/LLM integration</li>
+      </ul>
+      <button class="pkg-cta primary" onclick="startProject('Telegram Bot – Business')">Get Started</button>
+    </div>
+    <div class="pkg-card">
+      <div class="pkg-tier-icon">💎</div>
+      <div class="pkg-tier-name premium">Premium</div>
+      <div class="pkg-title">AI Automation Bot</div>
+      <div class="pkg-price">$999+ <span>/ quote</span></div>
+      <div class="pkg-timeline">⏱ 2–4 Weeks</div>
+      <hr class="pkg-divider" />
+      <ul class="pkg-features">
+        <li><span class="check">✓</span> Full Mini App SPA</li>
+        <li><span class="check">✓</span> OpenAI / Gemini integration</li>
+        <li><span class="check">✓</span> CRM & webhook integrations</li>
+        <li><span class="check">✓</span> Multi-bot management panel</li>
+        <li><span class="check">✓</span> Scheduled messaging / broadcasts</li>
+        <li><span class="check">✓</span> Analytics dashboard</li>
+        <li><span class="check">✓</span> Custom AI workflows</li>
+        <li><span class="check">✓</span> 2-month post-launch support</li>
+      </ul>
+      <button class="pkg-cta secondary" onclick="startProject('Telegram Bot – Premium')">Get Started</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PORTFOLIO ══════════════ -->
+<div id="portfolio" class="section">
+  <div class="section-header">
+    <h1>Our <span class="grad-text">Portfolio</span></h1>
+    <p>Real products. Real impact. Shipped by Aha Agency.</p>
+  </div>
+
+  <div class="portfolio-filters">
+    <button class="filter-pill active" onclick="filterPortfolio('all', this)">🌟 All</button>
+    <button class="filter-pill" onclick="filterPortfolio('mobile', this)">📱 Mobile</button>
+    <button class="filter-pill" onclick="filterPortfolio('web', this)">🌐 Web</button>
+    <button class="filter-pill" onclick="filterPortfolio('ai', this)">🤖 AI</button>
+  </div>
+
+  <div class="portfolio-grid">
+
+    <!-- 1. Birhan Study -->
+    <div class="port-card" data-type="mobile">
+      <div class="port-card-header">
+        <div class="port-icon mobile">📚</div>
+        <div class="port-meta">
+          <div class="port-type-badge mobile">📱 Mobile App</div>
+          <div class="port-title">Birhan Study</div>
+          <div class="port-subtitle">Comprehensive Educational Companion</div>
+        </div>
+        <div class="port-stat">10k+ installs</div>
+      </div>
+      <div class="port-body">
+        <p class="port-desc">
+          An AI-powered educational platform designed for Ethiopian students preparing for university exams and navigating the new curriculum. Provides curated resources, AI-powered assistance, and gamified learning tools to boost academic excellence.
+        </p>
+        <div class="port-tech-row">
+          <span class="tech-chip">Flutter</span>
+          <span class="tech-chip">Dart</span>
+          <span class="tech-chip">Firebase</span>
+          <span class="tech-chip">AI Integration</span>
+        </div>
+      </div>
+      <div class="port-links">
+        <a class="port-link store" href="https://play.google.com/store/apps/details?id=com.ethio.newcurriculum.books" target="_blank">▶ Play Store</a>
+        <a class="port-link github" href="https://github.com/abdumic/Birhan-Study" target="_blank">⌥ GitHub</a>
+      </div>
+    </div>
+
+    <!-- 2. Habicar -->
+    <div class="port-card" data-type="web">
+      <div class="port-card-header">
+        <div class="port-icon web">🚗</div>
+        <div class="port-meta">
+          <div class="port-type-badge web">🌐 Web App</div>
+          <div class="port-title">Habicar</div>
+          <div class="port-subtitle">Car Rental System</div>
+        </div>
+      </div>
+      <div class="port-body">
+        <p class="port-desc">
+          A comprehensive platform for renting cars online with secure JWT authentication, MySQL database, and modern user experience. Features car browsing, booking system, payment integration, and an admin dashboard.
+        </p>
+        <ul class="port-features-list">
+          <li>Secure JWT authentication</li>
+          <li>Car browsing & booking system</li>
+          <li>Admin dashboard</li>
+          <li>Payment integration</li>
+          <li>User profiles with booking history</li>
+        </ul>
+        <div class="port-tech-row">
+          <span class="tech-chip">React</span>
+          <span class="tech-chip">Node.js</span>
+          <span class="tech-chip">Express</span>
+          <span class="tech-chip">MySQL</span>
+          <span class="tech-chip">JWT</span>
+        </div>
+      </div>
+      <div class="port-links">
+        <a class="port-link demo" href="https://car-rental-ah.vercel.app/" target="_blank">🔗 Live Demo</a>
+      </div>
+    </div>
+
+    <!-- 3. Programming Students Forum -->
+    <div class="port-card" data-type="web ai">
+      <div class="port-card-header">
+        <div class="port-icon ai">💬</div>
+        <div class="port-meta">
+          <div class="port-type-badge web">🌐 Web App</div>
+          <div class="port-title">Programming Students Forum</div>
+          <div class="port-subtitle">Q&A Platform with AI Agent</div>
+        </div>
+      </div>
+      <div class="port-body">
+        <p class="port-desc">
+          A specialized Q&A platform where programming students post questions, provide answers, and engage with the community. Includes an AI agent for guidance and seamless school UI integration.
+        </p>
+        <ul class="port-features-list">
+          <li>JWT authentication for students</li>
+          <li>Question & answer + voting system</li>
+          <li>AI agent for user guidance</li>
+          <li>School UI integration</li>
+        </ul>
+        <div class="port-tech-row">
+          <span class="tech-chip">React</span>
+          <span class="tech-chip">Node.js</span>
+          <span class="tech-chip">Express</span>
+          <span class="tech-chip">MySQL</span>
+          <span class="tech-chip">AI Integration</span>
+        </div>
+      </div>
+      <div class="port-links">
+        <a class="port-link demo" href="https://adlevangadiforum.netlify.app/" target="_blank">🔗 Live Demo</a>
+        <a class="port-link github" href="https://github.com/adel-kd/forumFront" target="_blank">⌥ GitHub</a>
+      </div>
+    </div>
+
+    <!-- 4. AGRICA -->
+    <div class="port-card" data-type="web ai mobile">
+      <div class="port-card-header">
+        <div class="port-icon ai">🌿</div>
+        <div class="port-meta">
+          <div class="port-type-badge ai">🤖 AI Platform</div>
+          <div class="port-title">AGRICA</div>
+          <div class="port-subtitle">AI-Powered Agriculture for Africa</div>
+        </div>
+      </div>
+      <div class="port-body">
+        <p class="port-desc">
+          An AI-driven agricultural platform connecting farmers and buyers while providing agronomy support through voice, web, and mobile technologies. Designed for African farmers — including those without internet access or smartphones.
+        </p>
+        <ul class="port-features-list">
+          <li>Voice-based AI agronomy support (offline-ready)</li>
+          <li>Farmer-to-buyer marketplace</li>
+          <li>Web + Mobile + IVR interfaces</li>
+          <li>Real-time market data</li>
+        </ul>
+        <div class="port-tech-row">
+          <span class="tech-chip">React</span>
+          <span class="tech-chip">Node.js</span>
+          <span class="tech-chip">AI/ML</span>
+          <span class="tech-chip">Voice APIs</span>
+          <span class="tech-chip">Flutter</span>
+        </div>
+      </div>
+      <div class="port-links">
+        <a class="port-link demo" href="https://agrica-project.vercel.app/" target="_blank">🔗 Live Demo</a>
+        <a class="port-link github" href="https://github.com/adel-kd/agrica-project" target="_blank">⌥ GitHub</a>
+      </div>
+    </div>
+
+    <!-- 5. ASC -->
+    <div class="port-card" data-type="web ai">
+      <div class="port-card-header">
+        <div class="port-icon ai">🧠</div>
+        <div class="port-meta">
+          <div class="port-type-badge ai">🤖 AI Platform</div>
+          <div class="port-title">ASC – AI Study Companion</div>
+          <div class="port-subtitle">Intelligent Learning Assistant</div>
+        </div>
+      </div>
+      <div class="port-body">
+        <p class="port-desc">
+          An intelligent learning assistant that helps students study smarter, stay organized, and improve academic performance using AI-powered tools — including summaries, quizzes, and personalized learning support.
+        </p>
+        <ul class="port-features-list">
+          <li>AI-generated summaries & quizzes</li>
+          <li>Personalized learning plans</li>
+          <li>Study progress tracker</li>
+          <li>Gemini AI integration</li>
+        </ul>
+        <div class="port-tech-row">
+          <span class="tech-chip">React</span>
+          <span class="tech-chip">Gemini AI</span>
+          <span class="tech-chip">Node.js</span>
+        </div>
+      </div>
+      <div class="port-links">
+        <a class="port-link demo" href="https://asc-gemini.vercel.app/" target="_blank">🔗 Live Demo</a>
+        <a class="port-link github" href="https://github.com/habibi-code/ASC" target="_blank">⌥ GitHub</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Initialize Telegram WebApp
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    tg.ready();
+    tg.expand();
+  }
+
+  // ── NAVIGATION ──
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // ── PACKAGE FILTER ──
+  function filterPkg(type, btn) {
+    document.querySelectorAll('[id^="pkg-"]').forEach(el => el.style.display = 'none');
+    document.getElementById('pkg-' + type).style.display = 'grid';
+    document.querySelectorAll('.pkg-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ── PORTFOLIO FILTER ──
+  function filterPortfolio(type, btn) {
+    document.querySelectorAll('.port-card').forEach(card => {
+      if (type === 'all') {
+        card.style.display = '';
+      } else {
+        const t = card.dataset.type || '';
+        card.style.display = t.includes(type) ? '' : 'none';
+      }
+    });
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ── START PROJECT (sends data back to bot) ──
+  function startProject(pkg) {
+    if (tg) {
+      tg.sendData(JSON.stringify({ action: 'start_project', package: pkg }));
+    } else {
+      alert('Opening project intake for: ' + pkg);
+    }
+  }
+</script>
+</body>
+</html>
